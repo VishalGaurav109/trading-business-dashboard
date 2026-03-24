@@ -1,0 +1,99 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2868
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \
+USE trading_project;\
+\
+-- 4. VALIDATION\
+\
+SELECT COUNT(*) AS total_clients FROM clients;\
+SELECT COUNT(*) AS total_trades FROM trades;\
+SELECT COUNT(*) AS total_accounts FROM accounts;\
+SELECT COUNT(*) AS total_tickets FROM support_tickets;\
+\
+-- 5. KPI QUERIES (DASHBOARD)\
+\
+-- Total Clients\
+SELECT COUNT(*) AS total_clients FROM clients;\
+\
+-- Total Trading Volume\
+SELECT SUM(trade_amount) AS total_volume FROM trades;\
+\
+-- Active Accounts\
+SELECT COUNT(*) AS active_accounts\
+FROM accounts\
+WHERE account_status = 'Active';\
+\
+-- Total Revenue (Assume 0.1% brokerage)\
+SELECT SUM(trade_amount * 0.001) AS total_revenue\
+FROM trades;\
+\
+-- New Clients per Month\
+SELECT \
+    DATE_FORMAT(join_date, '%Y-%m') AS month,\
+    COUNT(*) AS new_clients\
+FROM clients\
+GROUP BY month\
+ORDER BY month;\
+\
+-- Trading Volume by Segment\
+SELECT \
+    segment,\
+    SUM(trade_amount) AS volume\
+FROM trades\
+GROUP BY segment\
+ORDER BY volume DESC;\
+\
+-- City-wise Clients\
+SELECT \
+    city,\
+    COUNT(*) AS total_clients\
+FROM clients\
+GROUP BY city\
+ORDER BY total_clients DESC;\
+\
+-- Support Tickets Status\
+SELECT \
+    status,\
+    COUNT(*) AS total_tickets\
+FROM support_tickets\
+GROUP BY status;\
+\
+-- Monthly Trading Trend\
+SELECT \
+    DATE_FORMAT(trade_date, '%Y-%m') AS month,\
+    SUM(trade_amount) AS total_volume\
+FROM trades\
+GROUP BY month\
+ORDER BY month;\
+\
+-- Top 5 Clients by Trading Volume\
+SELECT \
+    c.client_id,\
+    SUM(t.trade_amount) AS total_volume\
+FROM trades t\
+JOIN clients c ON t.client_id = c.client_id\
+GROUP BY c.client_id\
+ORDER BY total_volume DESC\
+LIMIT 5;\
+\
+-- 6. FINAL VIEW (FOR POWER BI)\
+\
+CREATE OR REPLACE VIEW dashboard_data AS\
+SELECT \
+    t.trade_id,\
+    t.trade_date,\
+    t.segment,\
+    t.trade_amount,\
+    c.client_type,\
+    c.city,\
+    a.account_status\
+FROM trades t\
+JOIN clients c ON t.client_id = c.client_id\
+JOIN accounts a ON t.client_id = a.client_id;\
+\
+SELECT * FROM dashboard_data;}
