@@ -48,7 +48,7 @@ The project follows a star schema:
 ---
 
 ## 📸 Dashboard Preview
-Dashboard
+[Dashboard](https://github.com/VishalGaurav109/trading-business-dashboard/blob/main/trade%20dashboard.pdf)
 
 ---
 
